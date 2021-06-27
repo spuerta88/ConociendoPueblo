@@ -1,17 +1,31 @@
 package com.example.conociendopueblo;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.widget.Toast;
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
+import java.util.Locale;
 
 public class Home extends AppCompatActivity {
 
     ArrayList<Pueblo> listAtrib = new ArrayList<>();
     RecyclerView list;
+    FirebaseFirestore bDatos = FirebaseFirestore.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,13 +36,76 @@ public class Home extends AppCompatActivity {
         list.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
 
         createList();
-        ListaAdaptador adaptador = new ListaAdaptador(listAtrib);
-        list.setAdapter(adaptador);
+
     }
 
-    private void createList()
+    public void cambiarIdioma(String lenguaje)
     {
-        listAtrib.add(new Pueblo("Parroquia de San Antornio", "Támesis, es el primer municipio de Antioquia que dijo no a la minería metálica, un pueblo aunténtico al que aún no ha llegado el turismo de masas y dónde encontrarás un destino perfecto para salir un fin de semana con la familia.", R.drawable.iglesia));
-        listAtrib.add(new Pueblo("Monte mágico", "Situado en Támesis, ofrece alojamiento con piscina al aire libre, conexíon WiFi gratuita, restaurante y bar.", R.drawable.monte));
+        Locale idioma = new Locale(lenguaje);
+        Locale.setDefault(idioma);
+
+        Configuration configurationTelefono = getResources().getConfiguration();
+        configurationTelefono.locale = idioma;
+        getBaseContext().getResources().updateConfiguration(configurationTelefono, getBaseContext().getResources().getDisplayMetrics());
+    }
+
+
+    public boolean onCreateOptionsMenu(Menu menu){
+        getMenuInflater().inflate(R.menu.menu, menu);
+        return (true);
+    }
+
+    public boolean onOptionsItemSelected(MenuItem item){
+        int id = item.getItemId();
+
+        switch (id)
+        {
+            case (R.id.opt1):
+
+                Intent   intent = new Intent(Home.this, acercaDe.class);
+                startActivity(intent);
+
+                break;
+            case (R.id.opt2):
+
+                cambiarIdioma("es");
+                Intent intent2 = new Intent(Home.this, Home.class);
+                startActivity(intent2);
+
+                break;
+            case (R.id.opt3):
+                cambiarIdioma("en");
+                Intent intent3 = new Intent(Home.this, Home.class);
+                startActivity(intent3);
+                break;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void createList( )
+    {
+        bDatos.collection("pueblo")
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                String titulo, descripcion, imagen;
+                                titulo = document.get("titulo").toString();
+                                descripcion = document.get("descripcion").toString();
+                                imagen = document.get("imagen").toString();
+
+                                listAtrib.add(new Pueblo(titulo, descripcion, imagen));
+                                ListaAdaptador listaAdaptador = new ListaAdaptador(listAtrib);
+                                list.setAdapter(listaAdaptador);
+                            }
+                        }
+                        else
+                        {
+                            Toast.makeText(Home.this, "Error al consultar los datos.", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
     }
 }

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Knowing Pueblo</string>
+    <string name="opt1">about us</string>
+    <string name="opt2">spanish</string>
+    <string name="opt3">english</string>
+    <string name="descripcion">My name is Sebastian, I am a software design and development student, at the moment I am working as a cashier in a parking lot</string>
+</resources>

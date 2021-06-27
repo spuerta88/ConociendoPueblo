@@ -1,4 +1,8 @@
 <resources>
-    <string name="app_name">ConociendoPueblo</string>
+    <string name="app_name">Conociendo Pueblo</string>
     <string name="titulo">Tamesis</string>
+    <string name="opt1">acerca de</string>
+    <string name="opt2">español</string>
+    <string name="opt3">ingles</string>
+    <string name="descripcion">Mi nombre es Sebastian, soy estudiante de Diseño y desarrollo de sofware, en el momento me encuentro laborando como cajero en un parqueadero</string>
 </resources>
